@@ -12,87 +12,73 @@ import java.util.*;
 @RestController
 public class WordLadderController {
 
-    String sourceWord = "hello";
-    String targetWord;
+    @RequestMapping(value = "/Auth")
+    public String Auth(String username,String password){
+        if(username.equals("")){
+            return "Please input your username";
+        }
+        if(password.equals("")){
+            return "Please input your password";
+        }
 
-    public String test(String source){
-        return "hello";
-    }
-
-    @RequestMapping(value = "/wordladder")
-    public String say() {
-
-        return "<input placeholder=\"source\" id=\"source\"></input>"+
-                "<input placeholder=\"target\" id=\"target\"></input>"+
-                "<button onClick={javascript:alert(getElementById(\"source\").value)}>lookup</button>";
+        return "welcome " + username;
     }
 
 
-    @RequestMapping(value = "/w")
-    public static void init(String source,String target) throws IOException {
 
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Dictionary file name?");
-        String fileName = sc.nextLine();
+    @RequestMapping(value = "/wl")
+    public String init(String source,String target) throws IOException {
 
-        while(true) {
-            while(true) {
-                String alphabet = "abcdefghijklmnopqrstuvwxyz";
-                System.out.println("Word #1 (or Enter to quit): ");
-                String wordOne = sc.nextLine();
-                if (wordOne.equals("")) {
-                    System.out.println("Have a nice day.");
-                    return;
-                }
 
-                System.out.println("Word #2 (or Enter to quit): ");
-                String wordTwo = sc.nextLine();
-                if (wordTwo.equals("")) {
-                    System.out.println("Have a nice day.");
-                    return;
-                }
+        String fileName = "dictionary.txt";
+        String alphabet = "abcdefghijklmnopqrstuvwxyz";
+        String wordOne = source;
+        if (wordOne.equals("")) {
+            return "Have a nice day.";
+        }
+        String wordTwo = target;
+        if (wordTwo.equals("")) {
+            return "Have a nice day.";
+        }
 
-                int lenOne = wordOne.length();
-                int lenTwo = wordTwo.length();
-                if (wordOne.equals(wordTwo)) {
-                    System.out.println("The two words must be different.");
-                    return;
-                }
+        int lenOne = wordOne.length();
+        int lenTwo = wordTwo.length();
+        if (wordOne.equals(wordTwo)) {
+            return "The two words must be different.";
+        }
 
-                if (lenOne != lenTwo) {
-                    System.out.println("The two words must be the same length.");
-                    return;
-                }
+        if (lenOne != lenTwo) {
+            return "The two words must be the same length.";
+        }
 
-                BufferedReader br = new BufferedReader(new FileReader(fileName));
-                Set<String> words = new HashSet();
-                String str = null;
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        Set<String> words = new HashSet();
+        String str = null;
 
-                while((str = br.readLine()) != null) {
-                    if (str.length() == lenOne) {
-                        words.add(str);
-                    }
-                }
-
-                Queue<Stack<String>> ladders = new LinkedList();
-                Stack<String> first = new Stack();
-                first.push(wordOne);
-                ladders.offer(first);
-                Stack<String> result = wordladder(wordTwo, ladders, words, alphabet);
-                if (((String)result.peek()).equals("no ladder")) {
-                    System.out.println("No word ladder found from " + wordTwo + " back to " + wordOne);
-                } else {
-                    System.out.println("A ladder from " + wordTwo + " back to " + wordOne + " : ");
-
-                    while(!result.empty()) {
-                        System.out.print((String)result.peek() + " ");
-                        result.pop();
-                    }
-
-                    System.out.println("");
-                }
+        while ((str = br.readLine()) != null) {
+            if (str.length() == lenOne) {
+                words.add(str);
             }
         }
+
+        Queue<Stack<String>> ladders = new LinkedList();
+        Stack<String> first = new Stack();
+        first.push(wordOne);
+        ladders.offer(first);
+        Stack<String> result = wordladder(wordTwo, ladders, words, alphabet);
+        if (((String) result.peek()).equals("no ladder")) {
+            return "No word ladder found from " + wordTwo + " back to " + wordOne;
+        } else {
+            String output = "A ladder from " + wordTwo + " back to " + wordOne + " : ";
+
+            while (!result.empty()) {
+                output = output + (String)result.peek() + " ";
+                result.pop();
+            }
+            return output;
+        }
+
+
     }
 
     public static Stack<String> wordladder(String wordTwo, Queue<Stack<String>> ladders, Set<String> words, String alphabet) {
