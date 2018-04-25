@@ -14,21 +14,37 @@ public class WordLadderController {
 
     @RequestMapping(value = "/Auth")
     public String Auth(String username,String password){
+
+
         if(username.equals("")){
             return "Please input your username";
         }
+
         if(password.equals("")){
-            return "Please input your password";
+            return "Password can't be null";
         }
 
-        return "welcome " + username;
+        initUser();
+        if(!info.containsKey(username)){
+            return "Invalid username or password";
+        }
+
+        if(info.get(username).equals(password)){
+            return "Login successfully! Your token is " + createToken(username,password);
+        }
+        else
+            return "Invalid username or password";
+
     }
 
 
 
     @RequestMapping(value = "/wl")
-    public String init(String source,String target) throws IOException {
+    public String init(String source,String target,String tokenId) throws IOException {
 
+        if(!tokenTable.contains(tokenId)){
+            return "Please visit /Auth to login";
+        }
 
         String fileName = "dictionary.txt";
         String alphabet = "abcdefghijklmnopqrstuvwxyz";
@@ -81,7 +97,7 @@ public class WordLadderController {
 
     }
 
-    public static Stack<String> wordladder(String wordTwo, Queue<Stack<String>> ladders, Set<String> words, String alphabet) {
+    private static Stack<String> wordladder(String wordTwo, Queue<Stack<String>> ladders, Set<String> words, String alphabet) {
         int size = ladders.size();
         Stack test;
         if (size == 0) {
@@ -126,5 +142,29 @@ public class WordLadderController {
 
             return wordladder(wordTwo, ladders, words, alphabet);
         }
+    }
+
+    private static Map<String,String> info = new HashMap<>();
+
+    private static void initUser(){
+
+        info.put("user01","100001");
+        info.put("user02","200002");
+        info.put("user03","300003");
+        info.put("user04","400004");
+        info.put("user05","500005");
+        info.put("user06","600006");
+        info.put("user07","700007");
+        info.put("user08","800008");
+        info.put("user09","900009");
+
+    }
+
+    private static Set<String> tokenTable = new HashSet<>();
+
+    private static String createToken(String username,String password){
+        String tokenId = username.substring(2,3) + password.substring(5,6);
+        tokenTable.add(tokenId);
+        return tokenId;
     }
 }
