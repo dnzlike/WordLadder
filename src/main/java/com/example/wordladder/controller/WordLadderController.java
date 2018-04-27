@@ -1,7 +1,10 @@
-package com.example.demo;
+package com.example.wordladder.controller;
 
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
@@ -12,7 +15,12 @@ import java.util.*;
 @RestController
 public class WordLadderController {
 
-    @RequestMapping(value = "/Auth")
+    @RequestMapping(value = "/login", method= RequestMethod.GET)
+    public String login(){
+        return "login";
+    }
+
+    @RequestMapping(value = "/auth")
     public String Auth(String username,String password){
 
 
@@ -30,7 +38,12 @@ public class WordLadderController {
         }
 
         if(info.get(username).equals(password)){
-            return "Login successfully! Your token is " + createToken(username,password);
+            // Once a new user login, other users token should be clear
+            tokenTable.clear();
+            return "<p>Login successfully!</p>" +
+                    "<p>Your token is " +
+                    createToken(username) + "</p>" +
+                    "<p>Now you can visit /wl with tokenId</p>";
         }
         else
             return "Invalid username or password";
@@ -42,8 +55,9 @@ public class WordLadderController {
     @RequestMapping(value = "/wl")
     public String init(String source,String target,String tokenId) throws IOException {
 
-        if(!tokenTable.contains(tokenId)){
-            return "Please visit /Auth to login";
+        if(!tokenTable.containsKey(tokenId)){
+            return "<p>Invalid tokenId</P>" +
+                    "<p>Please visit /Auth to login</p>";
         }
 
         String fileName = "dictionary.txt";
@@ -160,11 +174,20 @@ public class WordLadderController {
 
     }
 
-    private static Set<String> tokenTable = new HashSet<>();
+    private static Map<String,String> tokenTable = new HashMap<>();
 
-    private static String createToken(String username,String password){
-        String tokenId = username.substring(2,3) + password.substring(5,6);
-        tokenTable.add(tokenId);
-        return tokenId;
+    /*
+     * create a random string as token
+     */
+    private static String createToken(String username){
+        String str="zxcvbnmlkjhgfdsaqwertyuiopQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+        Random random=new Random();
+        StringBuffer temp = new StringBuffer();
+        for(int i=0; i < 4; ++i){
+            int number=random.nextInt(62);
+            temp.append(str.charAt(number));
+        }
+        tokenTable.put(temp.toString(),username);
+        return temp.toString();
     }
 }
