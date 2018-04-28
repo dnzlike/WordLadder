@@ -14,14 +14,9 @@ public class DataInit {
 
     @PostConstruct
     public void dataInit(){
-        User admin = new User();
-        admin.setPassword("admin");
-        admin.setUsername("admin");
-        admin.setRole(User.ROLE.admin);
-        userRepository.save(admin);
 
         User user = new User();
-        user.setPassword("user");
+        user.setPassword("123456");
         user.setUsername("user");
         user.setRole(User.ROLE.user);
         userRepository.save(user);
