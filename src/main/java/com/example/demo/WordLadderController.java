@@ -22,7 +22,7 @@ public class WordLadderController {
     @RequestMapping(value = "/wordladder")
     public String say() {
 
-        return "<input placeholder=\"source\" id=\"source\"></input>"+
+        return "success!"+"<input placeholder=\"source\" id=\"source\"></input>"+
                 "<input placeholder=\"target\" id=\"target\"></input>"+
                 "<button onClick={javascript:alert(getElementById(\"source\").value)}>lookup</button>";
     }
